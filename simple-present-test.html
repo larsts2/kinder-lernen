@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Janoschs Englisch Lern Website</title>
+    <style>
+      :root {
+        --page-bg: #eef4f7;
+        --page-accent: #0d5c7d;
+        --page-accent-soft: #dcecf3;
+        --card-bg: #fffdf8;
+        --text-main: #1d2730;
+        --text-muted: #51606d;
+        --border: #cad8df;
+        --success: #1f6b3b;
+        --success-bg: #e8f6eb;
+        --error: #9c2f21;
+        --error-bg: #fdecea;
+        --shadow: 0 18px 48px rgba(13, 92, 125, 0.12);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Avenir Next", "Trebuchet MS", sans-serif;
+        color: var(--text-main);
+        background: radial-gradient(
+            circle at top left,
+            #fdf7e8 0%,
+            transparent 28%
+          ),
+          radial-gradient(circle at top right, #d7ebf4 0%, transparent 32%),
+          linear-gradient(180deg, #f6fbfd 0%, var(--page-bg) 100%);
+      }
+
+      .page {
+        width: min(960px, calc(100% - 32px));
+        margin: 32px auto;
+        padding: 28px;
+        border: 1px solid rgba(13, 92, 125, 0.08);
+        border-radius: 28px;
+        background: rgba(255, 253, 248, 0.92);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(10px);
+      }
+
+      .hero {
+        margin-bottom: 28px;
+      }
+
+      h1 {
+        margin: 0 0 10px;
+        font-size: clamp(2rem, 3vw, 3rem);
+        line-height: 1.05;
+        letter-spacing: -0.03em;
+      }
+
+      .intro {
+        margin: 0;
+        max-width: 65ch;
+        color: var(--text-muted);
+        font-size: 1.05rem;
+        line-height: 1.6;
+      }
+
+      .hint {
+        display: inline-flex;
+        align-items: center;
+        margin-top: 14px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: var(--page-accent-soft);
+        color: var(--page-accent);
+        font-size: 0.92rem;
+        font-weight: 600;
+      }
+
+      form {
+        display: grid;
+        gap: 20px;
+      }
+
+      .exercise-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 16px;
+      }
+
+      .exercise {
+        position: relative;
+        padding: 18px 18px 16px;
+        padding-right: 108px;
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        background: var(--card-bg);
+        transition: border-color 180ms ease, transform 180ms ease,
+          box-shadow 180ms ease;
+      }
+
+      .exercise:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 12px 24px rgba(13, 92, 125, 0.08);
+      }
+
+      .exercise.correct {
+        border-color: rgba(31, 107, 59, 0.35);
+        background: linear-gradient(180deg, #fffdf8 0%, #f6fbf7 100%);
+      }
+
+      .exercise.incorrect {
+        border-color: rgba(156, 47, 33, 0.28);
+        background: linear-gradient(180deg, #fffdf8 0%, #fff6f4 100%);
+      }
+
+      .exercise.locked-error {
+        border-color: rgba(171, 118, 22, 0.34);
+        background: linear-gradient(180deg, #fffdf8 0%, #fff8ea 100%);
+      }
+
+      .exercise-number {
+        margin: 0 0 10px;
+        color: var(--page-accent);
+        font-size: 0.88rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .exercise-info-button {
+        position: absolute;
+        top: 16px;
+        right: 58px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        border: 1px solid rgba(13, 92, 125, 0.18);
+        border-radius: 999px;
+        background: linear-gradient(180deg, #f7fbfd 0%, #e3eff4 100%);
+        color: var(--page-accent);
+        font-size: 1rem;
+        font-weight: 800;
+        cursor: pointer;
+        box-shadow: 0 8px 16px rgba(13, 92, 125, 0.1);
+      }
+
+      .exercise-info-button:hover,
+      .exercise-info-button:focus-visible {
+        outline: none;
+        transform: translateY(-1px);
+        box-shadow: 0 0 0 4px rgba(13, 92, 125, 0.14);
+      }
+
+      .exercise.show-explanation .exercise-info-button {
+        border-color: rgba(13, 92, 125, 0.32);
+        background: linear-gradient(180deg, #eef8fc 0%, #d6eaf2 100%);
+      }
+
+      .exercise-status {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        border: 2px solid transparent;
+        border-radius: 999px;
+        background: transparent;
+        color: transparent;
+        font-size: 1rem;
+        font-weight: 900;
+        opacity: 0;
+        transform: scale(0.72);
+        box-shadow: none;
+        transition: opacity 160ms ease, transform 160ms ease,
+          box-shadow 160ms ease;
+      }
+
+      .exercise.correct .exercise-status {
+        opacity: 1;
+        transform: scale(1);
+        border-color: #66c030;
+        background: linear-gradient(180deg, #9ae54d 0%, #4fae1c 100%);
+        color: #ffffff;
+        box-shadow: 0 0 0 4px rgba(102, 192, 48, 0.18),
+          0 10px 18px rgba(45, 106, 18, 0.24);
+      }
+
+      .exercise.incorrect .exercise-status {
+        opacity: 0;
+        transform: scale(0.72);
+      }
+
+      .sentence {
+        margin: 0;
+        font-size: 1.08rem;
+        line-height: 1.8;
+      }
+
+      .sentence input {
+        width: min(180px, 100%);
+        margin: 0 6px;
+        padding: 8px 10px;
+        border: 1.5px solid var(--border);
+        border-radius: 10px;
+        background: #fff;
+        color: var(--text-main);
+        font: inherit;
+        transition: border-color 150ms ease, box-shadow 150ms ease,
+          background 150ms ease;
+      }
+
+      .sentence input:focus {
+        outline: none;
+        border-color: var(--page-accent);
+        box-shadow: 0 0 0 4px rgba(13, 92, 125, 0.14);
+      }
+
+      .sentence input.correct {
+        border-color: rgba(31, 107, 59, 0.55);
+        background: var(--success-bg);
+      }
+
+      .sentence input.incorrect {
+        border-color: rgba(156, 47, 33, 0.5);
+        background: var(--error-bg);
+      }
+
+      .exercise-explanation {
+        max-height: 0;
+        margin: 0;
+        padding: 0 12px;
+        overflow: hidden;
+        border-left: 4px solid transparent;
+        border-radius: 10px;
+        background: transparent;
+        color: var(--text-muted);
+        font-size: 0.93rem;
+        line-height: 1.5;
+        opacity: 0;
+        transition: max-height 180ms ease, opacity 180ms ease,
+          margin-top 180ms ease, padding 180ms ease, border-color 180ms ease,
+          background 180ms ease;
+      }
+
+      .exercise.show-explanation .exercise-explanation {
+        max-height: 160px;
+        margin-top: 12px;
+        padding: 10px 12px;
+        border-left-color: rgba(13, 92, 125, 0.24);
+        background: rgba(220, 236, 243, 0.45);
+        opacity: 1;
+      }
+
+      .feedback {
+        min-height: 1.3em;
+        margin-top: 10px;
+        color: var(--text-muted);
+        font-size: 0.95rem;
+      }
+
+      .feedback.correct {
+        color: var(--success);
+        font-weight: 600;
+      }
+
+      .feedback.incorrect {
+        color: var(--error);
+      }
+
+      .feedback.locked-error {
+        color: #8c6016;
+        font-weight: 600;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 8px;
+      }
+
+      button {
+        appearance: none;
+        border: none;
+        border-radius: 999px;
+        padding: 14px 20px;
+        font: inherit;
+        font-weight: 700;
+        cursor: pointer;
+        transition: transform 140ms ease, opacity 140ms ease,
+          box-shadow 140ms ease;
+      }
+
+      button:hover {
+        transform: translateY(-1px);
+      }
+
+      button[type="submit"] {
+        background: var(--page-accent);
+        color: #fff;
+        box-shadow: 0 12px 24px rgba(13, 92, 125, 0.24);
+      }
+
+      .secondary {
+        background: #e8eef1;
+        color: var(--text-main);
+      }
+
+      .result {
+        padding: 18px 20px;
+        border-radius: 18px;
+        border: 1px solid rgba(13, 92, 125, 0.12);
+        background: linear-gradient(180deg, #f9fcfd 0%, #edf5f8 100%);
+      }
+
+      .result h2 {
+        margin: 0 0 8px;
+        font-size: 1.35rem;
+      }
+
+      .result p {
+        margin: 0;
+        color: var(--text-muted);
+        line-height: 1.6;
+      }
+
+      .progress-widget {
+        position: fixed;
+        right: 18px;
+        bottom: 18px;
+        z-index: 30;
+        width: 132px;
+        height: 132px;
+        pointer-events: none;
+      }
+
+      .progress-ring {
+        --progress-value: 0;
+        position: relative;
+        display: grid;
+        place-items: center;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: conic-gradient(
+          var(--page-accent) calc(var(--progress-value) * 1%),
+          rgba(13, 92, 125, 0.14) 0
+        );
+        box-shadow: 0 18px 32px rgba(13, 92, 125, 0.18);
+      }
+
+      .progress-ring::before {
+        content: "";
+        position: absolute;
+        inset: 14px;
+        border-radius: 50%;
+        background: rgba(255, 253, 248, 0.98);
+        box-shadow: inset 0 0 0 1px rgba(13, 92, 125, 0.08);
+      }
+
+      .progress-content {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+        padding: 10px;
+      }
+
+      .progress-percent {
+        margin: 0;
+        font-size: 1.45rem;
+        font-weight: 800;
+        line-height: 1;
+        color: var(--text-main);
+      }
+
+      .progress-meta {
+        margin: 4px 0 0;
+        font-size: 0.74rem;
+        color: var(--text-muted);
+        line-height: 1.3;
+      }
+
+      .progress-correct {
+        margin: 4px 0 0;
+        font-size: 0.74rem;
+        font-weight: 700;
+        color: var(--success);
+        line-height: 1.3;
+      }
+
+      .firework-layer {
+        position: fixed;
+        right: 0;
+        bottom: 118px;
+        z-index: 31;
+        width: 168px;
+        height: 150px;
+        overflow: visible;
+        pointer-events: none;
+      }
+
+      .firework-emoji {
+        position: absolute;
+        left: 50%;
+        bottom: 0;
+        opacity: 0;
+        transform: translate(-50%, 0) scale(0.3);
+        transform-origin: center;
+        text-shadow: 0 0 14px rgba(255, 214, 74, 0.4);
+        animation: firework-burst 980ms cubic-bezier(0.18, 0.72, 0.25, 1)
+          forwards;
+      }
+
+      @keyframes firework-burst {
+        0% {
+          opacity: 0;
+          transform: translate(-50%, 0) scale(0.3);
+        }
+
+        18% {
+          opacity: 1;
+          transform: translate(-50%, -8px) scale(0.95);
+        }
+
+        100% {
+          opacity: 0;
+          transform: translate(calc(-50% + var(--x)), var(--y))
+            scale(var(--scale)) rotate(var(--rotate));
+        }
+      }
+
+      @media (max-width: 720px) {
+        .page {
+          width: min(100% - 20px, 960px);
+          margin: 10px auto;
+          padding: 18px;
+          border-radius: 20px;
+        }
+
+        .sentence {
+          font-size: 1rem;
+        }
+
+        .sentence input {
+          display: inline-block;
+          width: 100%;
+          margin: 8px 0;
+        }
+
+        .progress-widget {
+          right: 10px;
+          bottom: 10px;
+          width: 108px;
+          height: 108px;
+        }
+
+        .firework-layer {
+          width: 132px;
+          height: 118px;
+          right: 0;
+          bottom: 96px;
+        }
+
+        .progress-ring::before {
+          inset: 12px;
+        }
+
+        .progress-percent {
+          font-size: 1.2rem;
+        }
+
+        .progress-meta,
+        .progress-correct {
+          font-size: 0.68rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <header class="hero">
+        <h1>Janoschs Englisch Lern Website</h1>
+        <p class="intro">
+          Simple Present Test: Fill in the missing sentence parts. The test
+          mixes statements, questions, and negative sentences.
+        </p>
+        <p class="hint">
+          40 sentences total. Each sentence is checked automatically when you
+          leave an input field. Grammar tips appear after a finished sentence or
+          when you click the info button. Upper and lower case matter, and once
+          a checked sentence is wrong it stays an error until reset. Full forms
+          and common contractions are accepted where they fit.
+        </p>
+      </header>
+
+      <form id="test-form" novalidate>
+        <ol class="exercise-list" id="exercise-list"></ol>
+
+        <div class="actions">
+          <button type="button" class="secondary" id="reset-button">
+            Reset form
+          </button>
+        </div>
+
+        <section class="result" id="result" hidden aria-live="polite"></section>
+      </form>
+    </main>
+
+    <aside class="progress-widget" aria-live="polite">
+      <div class="progress-ring" id="progress-ring">
+        <div class="progress-content">
+          <p class="progress-percent" id="progress-percent">0%</p>
+          <p class="progress-meta" id="progress-count">0/40 checked</p>
+          <p class="progress-correct" id="progress-correct">0 correct</p>
+        </div>
+      </div>
+    </aside>
+
+    <div class="firework-layer" id="firework-layer" aria-hidden="true"></div>
+
+    <script>
+      const exercises = [
+        {
+          segments: ["", " Mila ", " the piano after school? (to play)"],
+          answers: [["Does"], ["play"]],
+        },
+        {
+          segments: ["My grandfather ", " in a bookshop. (to work)"],
+          answers: [["works"]],
+        },
+        {
+          segments: ["Ben ", " his sports bag every morning. (to carry)"],
+          answers: [["carries"]],
+        },
+        {
+          segments: ["Nora ", " comics in class. (not / to read)"],
+          answers: [["does not read", "doesn't read"]],
+        },
+        {
+          segments: ["", " your cousins ", " to the station? (to walk)"],
+          answers: [["Do"], ["walk"]],
+        },
+        {
+          segments: ["The baker ", " fresh rolls at five o'clock. (to bake)"],
+          answers: [["bakes"]],
+        },
+        {
+          segments: ["We ", " cola at breakfast. (not / to drink)"],
+          answers: [["do not drink", "don't drink"]],
+        },
+        {
+          segments: ["The tram ", " in front of the museum. (to stop)"],
+          answers: [["stops"]],
+        },
+        {
+          segments: ["", " Jonas ", " his chores on Saturdays? (to do)"],
+          answers: [["Does"], ["do"]],
+        },
+        {
+          segments: ["My friends ", " in the river in summer. (to swim)"],
+          answers: [["swim"]],
+        },
+        {
+          segments: ["Clara ", " her phone in the library. (not / to use)"],
+          answers: [["does not use", "doesn't use"]],
+        },
+        {
+          segments: ["The gardener ", " the roses every evening. (to water)"],
+          answers: [["waters"]],
+        },
+        {
+          segments: ["", " the cat ", " under the table? (to sleep)"],
+          answers: [["Does"], ["sleep"]],
+        },
+        {
+          segments: ["I ", " TV before homework. (not / to watch)"],
+          answers: [["do not watch", "don't watch"]],
+        },
+        {
+          segments: ["Uncle Tim ", " us in July. (to visit)"],
+          answers: [["visits"]],
+        },
+        {
+          segments: ["", " she ", " the window after the lesson? (to open)"],
+          answers: [["Does"], ["open"]],
+        },
+        {
+          segments: ["The children ", " their lunchboxes at noon. (to open)"],
+          answers: [["open"]],
+        },
+        {
+          segments: ["My little brother ", " spinach. (not / to like)"],
+          answers: [["does not like", "doesn't like"]],
+        },
+        {
+          segments: ["Emma ", " new words on flashcards. (to write)"],
+          answers: [["writes"]],
+        },
+        {
+          segments: ["", " your dog ", " at night? (to bark)"],
+          answers: [["Does"], ["bark"]],
+        },
+        {
+          segments: ["The plane ", " at ten in the morning. (to arrive)"],
+          answers: [["arrives"]],
+        },
+        {
+          segments: ["We ", " the kitchen on Mondays. (not / to tidy)"],
+          answers: [["do not tidy", "don't tidy"]],
+        },
+        {
+          segments: ["", " they ", " presents on Christmas Eve? (to give)"],
+          answers: [["Do"], ["give"]],
+        },
+        {
+          segments: ["My parents ", " me with English. (to help)"],
+          answers: [["help"]],
+        },
+        {
+          segments: ["He ", " to bed before ten. (not / to go)"],
+          answers: [["does not go", "doesn't go"]],
+        },
+        {
+          segments: ["The shop ", " at half past eight. (to close)"],
+          answers: [["closes"]],
+        },
+        {
+          segments: ["", " Mia and Ben ", " the train to school? (to take)"],
+          answers: [["Do"], ["take"]],
+        },
+        {
+          segments: ["My aunt ", " on Fridays. (not / to cook)"],
+          answers: [["does not cook", "doesn't cook"]],
+        },
+        {
+          segments: ["The clouds ", " across the sky. (to move)"],
+          answers: [["move"]],
+        },
+        {
+          segments: ["Leo ", " his lunch before school. (to pack)"],
+          answers: [["packs"]],
+        },
+        {
+          segments: ["", " the nurse ", " her hands before work? (to wash)"],
+          answers: [["Does"], ["wash"]],
+        },
+        {
+          segments: ["Oliver ", " the guitar after lunch. (to practise)"],
+          answers: [["practises", "practices"]],
+        },
+        {
+          segments: ["I ", " emails on Sunday mornings. (not / to read)"],
+          answers: [["do not read", "don't read"]],
+        },
+        {
+          segments: ["", " your mother ", " tea with lemon? (to drink)"],
+          answers: [["Does"], ["drink"]],
+        },
+        {
+          segments: ["The teacher ", " us short quizzes. (to give)"],
+          answers: [["gives"]],
+        },
+        {
+          segments: ["We ", " dictionaries in this game. (not / to use)"],
+          answers: [["do not use", "don't use"]],
+        },
+        {
+          segments: ["", " the buses ", " here after midnight? (to stop)"],
+          answers: [["Do"], ["stop"]],
+        },
+        {
+          segments: ["Sara ", " her dog every weekend. (to brush)"],
+          answers: [["brushes"]],
+        },
+        {
+          segments: ["Maya ", " scary films. (not / to watch)"],
+          answers: [["does not watch", "doesn't watch"]],
+        },
+        {
+          segments: ["The students ", " their answers in pencil. (to write)"],
+          answers: [["write"]],
+        },
+      ];
+
+      const form = document.getElementById("test-form");
+      const exerciseList = document.getElementById("exercise-list");
+      const result = document.getElementById("result");
+      const resetButton = document.getElementById("reset-button");
+      const progressRing = document.getElementById("progress-ring");
+      const progressPercent = document.getElementById("progress-percent");
+      const progressCount = document.getElementById("progress-count");
+      const progressCorrect = document.getElementById("progress-correct");
+      const fireworkLayer = document.getElementById("firework-layer");
+      const renderedExercises = [];
+      const fireworkEmojis = ["🎆", "🎉", "✨", "🎊", "🌟", "💥"];
+      const verbTranslations = {
+        arrive: "ankommen",
+        bake: "backen",
+        bark: "bellen",
+        brush: "buersten",
+        carry: "tragen",
+        close: "schliessen",
+        cook: "kochen",
+        do: "machen",
+        drink: "trinken",
+        give: "geben",
+        go: "gehen",
+        help: "helfen",
+        like: "moegen",
+        move: "sich bewegen",
+        open: "oeffnen",
+        pack: "packen",
+        play: "spielen",
+        practise: "ueben",
+        read: "lesen",
+        sleep: "schlafen",
+        stop: "anhalten",
+        swim: "schwimmen",
+        take: "nehmen",
+        tidy: "aufräumen",
+        use: "benutzen",
+        visit: "besuchen",
+        walk: "gehen",
+        wash: "waschen",
+        watch: "anschauen",
+        water: "giessen",
+        work: "arbeiten",
+        write: "schreiben",
+      };
+
+      function normalize(text) {
+        return text.trim().replace(/[’]/g, "'").replace(/\s+/g, " ");
+      }
+
+      function addTranslationToSegment(segment) {
+        return segment.replace(
+          /\(((?:not\s*\/\s*)?to ([a-z]+))\)/i,
+          (match, prompt, verb) => {
+            const translation = verbTranslations[verb.toLowerCase()];
+
+            if (!translation) {
+              return match;
+            }
+
+            return `(${prompt} = ${translation})`;
+          }
+        );
+      }
+
+      function buildSolutionText(exercise) {
+        let solution = exercise.segments[0];
+
+        exercise.answers.forEach((answerSet, index) => {
+          solution += answerSet[0];
+          solution += exercise.segments[index + 1];
+        });
+
+        return solution.replace(/\s+/g, " ").trim();
+      }
+
+      function buildExerciseHint(exercise) {
+        const firstAnswer = exercise.answers[0][0];
+        const firstAnswerLower = firstAnswer.toLowerCase();
+
+        if (exercise.answers.length === 2 && firstAnswerLower === "does") {
+          return "Tipp: Bei Fragen mit he, she oder it benutzt du does + Grundform: Does Max play ...?, nicht Does Max plays ...?";
+        }
+
+        if (exercise.answers.length === 2 && firstAnswerLower === "do") {
+          return "Tipp: Bei Fragen mit I, you, we oder they benutzt du do + Grundform: Do they speak ...?";
+        }
+
+        if (
+          firstAnswerLower.startsWith("does not") ||
+          firstAnswerLower.startsWith("doesn't")
+        ) {
+          return "Tipp: Nach does not oder doesn't steht immer die Grundform: doesn't play, doesn't watch, doesn't like.";
+        }
+
+        if (
+          firstAnswerLower.startsWith("do not") ||
+          firstAnswerLower.startsWith("don't")
+        ) {
+          return "Tipp: Nach do not oder don't steht ebenfalls die Grundform ohne -s.";
+        }
+
+        if (exercise.answers[0].length > 1) {
+          return "Tipp: Hier sind zwei Schreibweisen erlaubt, weil britisches und amerikanisches Englisch unterschiedlich sein können.";
+        }
+
+        if (firstAnswerLower.endsWith("ies")) {
+          return "Tipp: Bei he, she oder it wird ein Verb auf Konsonant + y oft zu -ies: study -> studies.";
+        }
+
+        if (/(sses|shes|ches|xes|zes|oes)$/.test(firstAnswerLower)) {
+          return "Tipp: Bei he, she oder it bekommen Verben auf -s, -sh, -ch, -x, -z oder -o meistens -es: brush -> brushes, finish -> finishes.";
+        }
+
+        if (firstAnswerLower.endsWith("s")) {
+          return `Tipp: Bei he, she oder it kommt im bejahten Satz meistens nur -s dazu: ask -> ${firstAnswer}.`;
+        }
+
+        return "Tipp: Bei I, you, we und they benutzt du im Simple Present die Grundform ohne -s.";
+      }
+
+      function syncExerciseHint(renderedExercise) {
+        const shouldShow =
+          renderedExercise.checked || renderedExercise.manualHintOpen;
+        renderedExercise.item.classList.toggle("show-explanation", shouldShow);
+        renderedExercise.infoButton.setAttribute(
+          "aria-expanded",
+          shouldShow ? "true" : "false"
+        );
+      }
+
+      function resetExerciseState(renderedExercise) {
+        renderedExercise.item.classList.remove(
+          "correct",
+          "incorrect",
+          "locked-error"
+        );
+        renderedExercise.feedback.textContent = "";
+        renderedExercise.feedback.className = "feedback";
+
+        renderedExercise.inputs.forEach((input) => {
+          input.classList.remove("correct", "incorrect");
+        });
+      }
+
+      function updateProgress() {
+        const checkedSentences = renderedExercises.filter(
+          (exercise) => exercise.checked
+        ).length;
+        const correctSentences = renderedExercises.filter(
+          (exercise) => exercise.correct
+        ).length;
+        const errorSentences = renderedExercises.filter(
+          (exercise) => exercise.hasMistake
+        ).length;
+        const completionPercent = renderedExercises.length
+          ? Math.round((checkedSentences / renderedExercises.length) * 100)
+          : 0;
+
+        progressRing.style.setProperty("--progress-value", completionPercent);
+        progressPercent.textContent = `${completionPercent}%`;
+        progressCount.textContent = `${checkedSentences}/${renderedExercises.length} checked`;
+        progressCorrect.textContent = `${correctSentences} correct / ${errorSentences} errors`;
+
+        if (checkedSentences === 0) {
+          result.hidden = true;
+          result.innerHTML = "";
+          return;
+        }
+
+        result.hidden = false;
+        result.innerHTML = `
+        <h2>Progress</h2>
+        <p>You have checked ${checkedSentences} of ${
+          renderedExercises.length
+        } sentences. ${correctSentences} sentence${
+          correctSentences === 1 ? "" : "s"
+        } ${
+          correctSentences === 1 ? "is" : "are"
+        } correct so far, and ${errorSentences} sentence${
+          errorSentences === 1 ? "" : "s"
+        } already count ${
+          errorSentences === 1 ? "as an error" : "as errors"
+        }.</p>
+      `;
+      }
+
+      function launchProgressFirework() {
+        const particles = 7;
+
+        for (let index = 0; index < particles; index += 1) {
+          const particle = document.createElement("span");
+          const horizontalOffset = Math.round((Math.random() - 0.5) * 124);
+          const verticalOffset = -1 * (52 + Math.round(Math.random() * 72));
+          const rotation = `${Math.round((Math.random() - 0.5) * 90)}deg`;
+          const scale = (0.9 + Math.random() * 0.75).toFixed(2);
+          const emoji =
+            fireworkEmojis[Math.floor(Math.random() * fireworkEmojis.length)];
+
+          particle.className = "firework-emoji";
+          particle.textContent = emoji;
+          particle.style.setProperty("--x", `${horizontalOffset}px`);
+          particle.style.setProperty("--y", `${verticalOffset}px`);
+          particle.style.setProperty("--rotate", rotation);
+          particle.style.setProperty("--scale", scale);
+          particle.style.fontSize = `${20 + Math.round(Math.random() * 10)}px`;
+          particle.style.animationDelay = `${index * 45}ms`;
+
+          particle.addEventListener("animationend", () => {
+            particle.remove();
+          });
+
+          fireworkLayer.appendChild(particle);
+        }
+      }
+
+      function evaluateExercise(renderedExercise) {
+        const { item, feedback, inputs, exercise } = renderedExercise;
+        const wasCorrect = renderedExercise.correct;
+        const values = inputs.map((input) => normalize(input.value));
+        const allFilled = values.every((value) => value.length > 0);
+
+        if (!allFilled) {
+          if (!renderedExercise.checked && !renderedExercise.hasMistake) {
+            resetExerciseState(renderedExercise);
+            syncExerciseHint(renderedExercise);
+            updateProgress();
+          }
+          return;
+        }
+
+        let sentenceIsCorrect = true;
+
+        inputs.forEach((input, index) => {
+          const acceptedAnswers = input.dataset.answers
+            .split("|")
+            .map(normalize);
+          const isCorrect = acceptedAnswers.includes(values[index]);
+
+          if (!isCorrect) {
+            sentenceIsCorrect = false;
+          }
+
+          input.classList.toggle("correct", isCorrect);
+          input.classList.toggle("incorrect", !isCorrect);
+        });
+
+        renderedExercise.checked = true;
+        item.classList.remove("correct", "incorrect", "locked-error");
+
+        if (!sentenceIsCorrect) {
+          renderedExercise.hasMistake = true;
+          renderedExercise.correct = false;
+          item.classList.add("incorrect");
+          feedback.textContent = `Correct answer: ${buildSolutionText(
+            exercise
+          )}. This sentence counts as an error now.`;
+          feedback.className = "feedback incorrect";
+        } else if (renderedExercise.hasMistake) {
+          renderedExercise.correct = false;
+          item.classList.add("locked-error");
+          feedback.textContent =
+            "Now correct, but this sentence already counts as an error.";
+          feedback.className = "feedback locked-error";
+        } else {
+          renderedExercise.correct = true;
+          item.classList.add("correct");
+          feedback.textContent = "Correct.";
+          feedback.className = "feedback correct";
+
+          if (!wasCorrect) {
+            launchProgressFirework();
+          }
+        }
+
+        syncExerciseHint(renderedExercise);
+        updateProgress();
+      }
+
+      function renderExercises() {
+        exercises.forEach((exercise, index) => {
+          const item = document.createElement("li");
+          item.className = "exercise";
+
+          const infoButton = document.createElement("button");
+          infoButton.type = "button";
+          infoButton.className = "exercise-info-button";
+          infoButton.textContent = "i";
+          infoButton.setAttribute(
+            "aria-label",
+            `Show grammar tip for sentence ${index + 1}`
+          );
+          item.appendChild(infoButton);
+
+          const status = document.createElement("span");
+          status.className = "exercise-status";
+          status.setAttribute("aria-hidden", "true");
+          status.textContent = "✓";
+          item.appendChild(status);
+
+          const number = document.createElement("p");
+          number.className = "exercise-number";
+          number.textContent = `Sentence ${index + 1}`;
+          item.appendChild(number);
+
+          const sentence = document.createElement("p");
+          sentence.className = "sentence";
+
+          const explanation = document.createElement("p");
+          explanation.className = "exercise-explanation";
+          explanation.id = `exercise-explanation-${index + 1}`;
+          explanation.textContent = buildExerciseHint(exercise);
+          infoButton.setAttribute("aria-controls", explanation.id);
+          infoButton.setAttribute("aria-expanded", "false");
+
+          const inputs = [];
+
+          exercise.segments.forEach((segment, segmentIndex) => {
+            sentence.appendChild(
+              document.createTextNode(addTranslationToSegment(segment))
+            );
+
+            if (segmentIndex < exercise.answers.length) {
+              const input = document.createElement("input");
+              input.type = "text";
+              input.autocomplete = "off";
+              input.spellcheck = false;
+              input.setAttribute(
+                "aria-label",
+                `Sentence ${index + 1}, blank ${segmentIndex + 1}`
+              );
+              input.dataset.answers = exercise.answers[segmentIndex].join("|");
+              input.addEventListener("input", () => {
+                input.classList.remove("correct", "incorrect");
+              });
+              input.addEventListener("blur", (event) => {
+                if (
+                  renderedExercise.skipBlurEvaluation ||
+                  event.relatedTarget === renderedExercise.infoButton
+                ) {
+                  renderedExercise.skipBlurEvaluation = false;
+                  return;
+                }
+
+                evaluateExercise(renderedExercise);
+              });
+              sentence.appendChild(input);
+              inputs.push(input);
+            }
+          });
+
+          const feedback = document.createElement("p");
+          feedback.className = "feedback";
+
+          item.appendChild(sentence);
+          item.appendChild(explanation);
+          item.appendChild(feedback);
+          exerciseList.appendChild(item);
+
+          const renderedExercise = {
+            item,
+            infoButton,
+            feedback,
+            inputs,
+            exercise,
+            checked: false,
+            correct: false,
+            manualHintOpen: false,
+            hasMistake: false,
+            skipBlurEvaluation: false,
+          };
+
+          infoButton.addEventListener("pointerdown", () => {
+            renderedExercise.skipBlurEvaluation = true;
+          });
+
+          infoButton.addEventListener("click", () => {
+            renderedExercise.skipBlurEvaluation = false;
+            renderedExercise.manualHintOpen = !renderedExercise.manualHintOpen;
+            syncExerciseHint(renderedExercise);
+          });
+
+          renderedExercises.push(renderedExercise);
+        });
+      }
+
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+      });
+
+      resetButton.addEventListener("click", () => {
+        renderedExercises.forEach((renderedExercise) => {
+          renderedExercise.checked = false;
+          renderedExercise.correct = false;
+          renderedExercise.manualHintOpen = false;
+          renderedExercise.hasMistake = false;
+          renderedExercise.skipBlurEvaluation = false;
+          resetExerciseState(renderedExercise);
+          syncExerciseHint(renderedExercise);
+
+          renderedExercise.inputs.forEach((input) => {
+            input.value = "";
+          });
+        });
+
+        updateProgress();
+        renderedExercises[0]?.inputs[0]?.focus();
+      });
+
+      renderExercises();
+      updateProgress();
+    </script>
+  </body>
+</html>
