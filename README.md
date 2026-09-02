@@ -1,4 +1,4 @@
-# Kinder-Lernen: Division mit Rest
+# Kinder-Lernen: Division mit Rest!
 
 Eine einfache Mathe-Übungsseite für Grundschüler, die Division mit Rest üben möchten.
 
@@ -22,6 +22,7 @@ npm run build
 ```
 
 Das erzeugt den Ordner `docs/` mit:
+
 - `index.html` – die Hauptseite
 - `assets/app.js` – die gesamte Anwendungslogik
 - `assets/app.css` – alle Stile
@@ -33,14 +34,16 @@ Die Dateien im `docs/`-Ordner können direkt auf jeden Webserver kopiert oder lo
 Der Build-Ordner heißt `docs/`, damit GitHub Pages ihn direkt aus dem Repository heraus ausliefern kann.
 
 **Einmalige Einrichtung:**
+
 1. `npm run build` ausführen und den `docs/`-Ordner committen und pushen
 2. Im GitHub-Repository: **Settings → Pages**
-3. Unter *Build and deployment* → Source: **Deploy from a branch**
+3. Unter _Build and deployment_ → Source: **Deploy from a branch**
 4. Branch: `main` / Folder: `/docs` → **Save**
 
 Nach wenigen Minuten ist die Seite unter `https://<dein-nutzername>.github.io/<repo-name>/` erreichbar.
 
 **Update deployen:**
+
 ```bash
 npm run build
 git add docs/
@@ -59,15 +62,16 @@ GitHub Pages erkennt die Änderung automatisch und aktualisiert die Seite.
 Hier wird die Mathe-Logik erzeugt. Kernfunktion:
 
 ```ts
-generateProblems(count, maxDividend)
+generateProblems(count, maxDividend);
 ```
 
-| Parameter     | Standard | Bedeutung                          |
-|---------------|----------|------------------------------------|
-| `count`       | `10`     | Anzahl Aufgaben pro Runde          |
-| `maxDividend` | `100`    | Größte erlaubte Zahl (Zahlenraum)  |
+| Parameter     | Standard | Bedeutung                         |
+| ------------- | -------- | --------------------------------- |
+| `count`       | `10`     | Anzahl Aufgaben pro Runde         |
+| `maxDividend` | `100`    | Größte erlaubte Zahl (Zahlenraum) |
 
 **So funktioniert es intern:**
+
 1. Ein zufälliger Divisor (2–9) wird gewählt
 2. Ein zufälliger Dividend (≤ maxDividend) wird gewählt
 3. Ergebnis und Rest werden berechnet: `quotient = Math.floor(dividend / divisor)`, `remainder = dividend % divisor`
@@ -78,8 +82,8 @@ generateProblems(count, maxDividend)
 In `src/App.tsx` ganz oben:
 
 ```ts
-const PROBLEMS_PER_ROUND = 10  // Aufgaben pro Runde ändern
-const MAX_DIVIDEND = 100        // Zahlenraum ändern (z.B. 20 für Anfänger)
+const PROBLEMS_PER_ROUND = 10; // Aufgaben pro Runde ändern
+const MAX_DIVIDEND = 100; // Zahlenraum ändern (z.B. 20 für Anfänger)
 ```
 
 ### Anpassen: Divisor-Bereich
@@ -87,7 +91,7 @@ const MAX_DIVIDEND = 100        // Zahlenraum ändern (z.B. 20 für Anfänger)
 In `src/logic/generateProblems.ts`, Funktion `createOneProblem`:
 
 ```ts
-const divisor = randomInt(2, 9)  // z.B. auf randomInt(2, 4) für Anfänger
+const divisor = randomInt(2, 9); // z.B. auf randomInt(2, 4) für Anfänger
 ```
 
 ---
