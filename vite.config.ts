@@ -3,6 +3,8 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
+  // Base path must match the GitHub repo name for GitHub Pages subdirectory deployment
+  base: '/kinder-lernen/',
   build: {
     // Output to docs/ so GitHub Pages can serve it directly from the main branch
     outDir: 'docs',
